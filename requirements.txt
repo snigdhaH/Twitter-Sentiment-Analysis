@@ -4,5 +4,5 @@ matplotlib
 seaborn
 nltk
 scikit-learn
-flask
+Flask
 gunicorn 
