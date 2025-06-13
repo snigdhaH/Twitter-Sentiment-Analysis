@@ -8,11 +8,6 @@
 __pycache__/
 *.pyc
 
-# Model files
-*.pkl
-
-# CSV or data files
-*.csv
 
 # Virtual environments
 venv/
