@@ -1,0 +1,53 @@
+
+📘 SETUP GUIDE: How to Run twitter3.ipynb Locally
+
+✅ STEP 1: Install Python
+--------------------------------
+1. Go to: https://www.python.org/downloads
+2. Download and run the installer.
+3. IMPORTANT: Check the box "Add Python to PATH" during installation.
+
+✅ STEP 2: Open Command Prompt
+--------------------------------
+- Press Windows + R
+- Type `cmd` and press Enter
+
+✅ STEP 3: Install Jupyter Notebook
+--------------------------------
+Type this in Command Prompt:
+
+    pip install notebook
+
+✅ STEP 4: Create a Project Folder
+--------------------------------
+1. Make a folder on your Desktop called `twitter-analysis`
+2. Move the following files into that folder:
+   - twitter3.ipynb
+   - train.csv
+
+✅ STEP 5: Open Jupyter Notebook
+--------------------------------
+In Command Prompt, type:
+
+    cd Desktop\twitter-analysis
+    jupyter notebook
+
+Then click on `twitter3.ipynb` in the browser.
+
+✅ STEP 6: Install Python Libraries
+--------------------------------
+In the first cell of the notebook, paste and run this:
+
+    !pip install -r requirements.txt
+
+Then in a new cell, run:
+
+    import nltk
+    nltk.download('stopwords')
+
+✅ STEP 7: Run All Cells
+--------------------------------
+Use the toolbar: Cell > Run All
+Or run each cell with Shift + Enter
+
+That's it! You're running machine learning on tweets.

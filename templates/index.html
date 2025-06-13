@@ -1,0 +1,201 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
+  <title>Sentiment Analysis</title>
+  <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;600&family=Pacifico&display=swap" rel="stylesheet">
+  <link href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css" rel="stylesheet">
+  <style>
+    * {
+      margin: 0;
+      padding: 0;
+      box-sizing: border-box;
+      font-family: 'Inter', sans-serif;
+    }
+
+    body {
+      background: linear-gradient(145deg, #1da1f2, #d0f2ff);
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      justify-content: center;
+      min-height: 100vh;
+      padding: 40px 20px;
+      overflow-x: hidden;
+    }
+
+    .container {
+      background: #ffffff;
+      border-radius: 30px;
+      padding: 60px 50px;
+      max-width: 960px;
+      width: 100%;
+      box-shadow: 0 25px 60px rgba(0, 0, 0, 0.25);
+      animation: fadeIn 1s ease-in-out;
+      position: relative;
+      transition: all 0.3s ease-in-out;
+    }
+
+    @keyframes fadeIn {
+      from { opacity: 0; transform: scale(0.95); }
+      to { opacity: 1; transform: scale(1); }
+    }
+
+    h1 {
+      text-align: center;
+      font-family: 'Pacifico', cursive;
+      margin-bottom: 50px;
+      font-size: 50px;
+      color: #1da1f2;
+      text-shadow: 2px 2px 10px rgba(0,0,0,0.1);
+    }
+
+    .form-group {
+      margin-bottom: 30px;
+    }
+
+    label {
+      font-weight: 600;
+      display: block;
+      margin-bottom: 12px;
+      font-size: 20px;
+    }
+
+    textarea {
+      width: 100%;
+      height: 160px;
+      padding: 20px;
+      font-size: 18px;
+      border: 2px solid #ccc;
+      border-radius: 18px;
+      resize: vertical;
+      transition: all 0.3s ease;
+      background-color: #f9f9f9;
+    }
+
+    textarea:focus {
+      border-color: #1da1f2;
+      background-color: #fff;
+      outline: none;
+      box-shadow: 0 0 0 5px rgba(29, 161, 242, 0.15);
+    }
+
+    button {
+      width: 100%;
+      padding: 18px;
+      font-size: 20px;
+      background: linear-gradient(90deg, #1da1f2, #0072ff);
+      color: white;
+      border: none;
+      border-radius: 20px;
+      cursor: pointer;
+      font-weight: bold;
+      letter-spacing: 0.8px;
+      box-shadow: 0 8px 20px rgba(0,0,0,0.15);
+      transition: all 0.3s ease;
+    }
+
+    button:hover {
+      background: linear-gradient(90deg, #0072ff, #1a91da);
+      transform: translateY(-2px);
+      box-shadow: 0 12px 24px rgba(0,0,0,0.2);
+    }
+
+    .result {
+      margin-top: 35px;
+      padding: 35px;
+      border-radius: 25px;
+      font-size: 24px;
+      font-weight: 600;
+      text-align: center;
+      min-height: 100px;
+      transition: all 0.4s ease-in-out;
+    }
+
+    .result.positive {
+      background: #e1f5e5;
+      color: #2e7d32;
+      border: 3px solid #66bb6a;
+    }
+
+    .result.neutral {
+      background: #fffce6;
+      color: #f9a825;
+      border: 3px solid #fbc02d;
+    }
+
+    .result.negative {
+      background: #fdecea;
+      color: #c62828;
+      border: 3px solid #ef5350;
+    }
+
+    .footer {
+      text-align: center;
+      font-size: 15px;
+      color: #ffffffcc;
+      margin-top: 60px;
+      font-weight: 500;
+    }
+
+    .icon {
+      margin-right: 10px;
+    }
+  </style>
+</head>
+<body>
+  <div class="container">
+    <h1><i class="fab fa-twitter icon"></i>Sentiment Pulse</h1>
+    <div class="form-group">
+      <label for="text">What's happening?</label>
+      <textarea id="text" placeholder="E.g. Just watched a fantastic movie! 🎬"></textarea>
+    </div>
+    <button onclick="analyze()"><i class="fas fa-magic icon"></i>Analyze Now</button>
+    <div class="result" id="result">Your tweet's sentiment will appear here.</div>
+  </div>
+  <div class="footer">
+    &copy; 2025 Sentiment Pulse &bull; Built for production by Team ERROR404 🚀
+  </div>
+
+  <script>
+    function analyze() {
+      const text = document.getElementById("text").value.trim();
+      const resultBox = document.getElementById("result");
+
+      resultBox.className = 'result';
+      if (!text) {
+        resultBox.textContent = "Please enter a message.";
+        resultBox.classList.add("negative");
+        return;
+      }
+
+      fetch("/predict", {
+        method: "POST",
+        headers: {
+          "Content-Type": "application/json"
+        },
+        body: JSON.stringify({ text: text })
+      })
+      .then(response => response.json())
+      .then(data => {
+        const prediction = (data.prediction || "Unknown").toLowerCase();
+        resultBox.textContent = `Sentiment: ${data.prediction}`;
+
+        resultBox.classList.remove("positive", "neutral", "negative");
+        if (prediction === "positive") {
+          resultBox.classList.add("positive");
+        } else if (prediction === "negative") {
+          resultBox.classList.add("negative");
+        } else {
+          resultBox.classList.add("neutral");
+        }
+      })
+      .catch(error => {
+        resultBox.textContent = "Error: Something went wrong!";
+        resultBox.classList.add("negative");
+      });
+    }
+  </script>
+</body>
+</html>
