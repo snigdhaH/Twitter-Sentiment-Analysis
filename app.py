@@ -11,18 +11,17 @@ from nltk.stem.porter import PorterStemmer
 # Initialize Flask app
 app = Flask(__name__, template_folder='templates', static_folder='static')
 
-# Download stopwords (do only once)
-nltk.download('stopwords')
+# DO NOT download in production — do it in Dockerfile!
+# nltk.download('stopwords')  <-- this line is removed
 
-# Load trained Random Forest model
+# Load model and vectorizer
 with open("random_forest_model.pkl", "rb") as f:
     model = pickle.load(f)
 
-# Load TF-IDF vectorizer
 with open("text_vectorizer.pkl", "rb") as f:
     vectorizer = pickle.load(f)
 
-# Define TweetCleaner (copied from your notebook)
+# TweetCleaner class
 class TweetCleaner:
     def __init__(self):
         self.tokenizer = TweetTokenizer(strip_handles=False, reduce_len=True)
@@ -32,6 +31,7 @@ class TweetCleaner:
             'neither', 'nor', 'nothing', 'nowhere', 'nobody', 'hardly',
             'barely', 'scarcely', 'rarely'
         }
+        self.stop_words = set(stopwords.words('english')) - self.negation_words
 
     def remove_urls(self, text):
         return re.sub(r'https?://\S+|www\.\S+', '', text)
@@ -47,9 +47,8 @@ class TweetCleaner:
         return text.translate(str.maketrans('', '', string.punctuation))
 
     def remove_stopwords(self, text):
-        stop_words = set(stopwords.words('english')) - self.negation_words
         tokens = self.tokenizer.tokenize(text)
-        filtered = [self.stemmer.stem(word) for word in tokens if word.lower() not in stop_words]
+        filtered = [self.stemmer.stem(word) for word in tokens if word.lower() not in self.stop_words]
         return ' '.join(filtered)
 
     def handle_negation(self, text):
@@ -82,12 +81,11 @@ class TweetCleaner:
 # Instantiate cleaner
 cleaner = TweetCleaner()
 
-# Route to render index.html
+# Routes
 @app.route("/", methods=["GET"])
 def index():
-    return render_template("index.html")  # Ensure templates/index.html exists
+    return render_template("index.html")  # Make sure /templates/index.html exists
 
-# API route to make predictions
 @app.route("/predict", methods=["POST"])
 def predict():
     data = request.get_json()
@@ -102,7 +100,7 @@ def predict():
 
     return jsonify({"prediction": prediction})
 
-# Run the app
+# For local dev only — Render uses Gunicorn
 if __name__ == "__main__":
     port = int(os.environ.get("PORT", 5000))
     app.run(debug=False, host="0.0.0.0", port=port)
