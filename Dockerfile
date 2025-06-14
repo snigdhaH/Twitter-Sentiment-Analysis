@@ -31,4 +31,4 @@ ENV PORT=10000
 EXPOSE $PORT
 
 # Start the server with Gunicorn
-CMD ["gunicorn", "--workers=4", "--bind=0.0.0.0:$PORT", "app:app"]
+CMD ["gunicorn", "--workers=1", "--bind=0.0.0.0:$PORT", "app:app"]
